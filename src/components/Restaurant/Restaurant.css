@@ -1,0 +1,11 @@
+.menu-list {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100;
+}
+
+.ant-checkbox-group-item {
+  display: block;
+  margin-right: 0;
+}
