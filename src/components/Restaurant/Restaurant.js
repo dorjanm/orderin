@@ -3,12 +3,10 @@ import { Typography, Image } from "antd";
 
 import MenuList from "../MenuList/MenuList";
 
-function Restaurant({ restaurant }) {
+function Restaurant({ restaurant, ...props }) {
   const { Title } = Typography;
 
   const { Name, Suburb, Rank, LogoPath, Categories, MenuItems } = restaurant;
-
-  console.log("Categories", Categories);
 
   const title = `${Name} - ${Suburb} - rated #${Rank}`;
   const logo = `./${LogoPath}`;
@@ -20,11 +18,16 @@ function Restaurant({ restaurant }) {
         {title}
       </Title>
 
-      {Categories.map((category) => (
-        <MenuList items={category.MenuItems} category={category} />
+      {Categories.map((category, i) => (
+        <MenuList
+          items={category.MenuItems}
+          category={category}
+          key={i}
+          {...props}
+        />
       ))}
 
-      <MenuList items={MenuItems} />
+      <MenuList items={MenuItems} {...props} />
     </div>
   );
 }

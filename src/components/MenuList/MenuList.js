@@ -1,6 +1,6 @@
 import { Checkbox, Row, Typography } from "antd";
 
-function MenuList({ items, category }) {
+function MenuList({ items, category, ...props }) {
   const { Title } = Typography;
 
   return (
@@ -19,9 +19,11 @@ function MenuList({ items, category }) {
         style={{ display: "block", marginRight: 0 }}
       >
         {items.map((item) => (
-          <Row justify="center">
+          <Row justify="center" key={item.Id}>
             <Row style={{ width: "300px" }} justify="start">
-              <Checkbox onChange={() => console.log("selected: ", item.Name)}>
+              <Checkbox
+                onChange={(e) => props.selectMenuItem(e.target.checked, item)}
+              >
                 {item.Name}
               </Checkbox>
             </Row>
