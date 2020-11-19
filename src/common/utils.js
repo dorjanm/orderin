@@ -1,4 +1,4 @@
-import { union, difference } from "lodash";
+import { difference } from "lodash";
 
 export const filterRestaurant = (filterInput) => {
   const { restaurant, locationSearched } = filterInput;
@@ -41,7 +41,7 @@ export const getFitleredRestaurants = (searchKeyword, restaurants) => {
           ? otherCategories
               .map(({ MenuItems }) => MenuItems)
               .reduce((prevValue, currentValue) =>
-                union(prevValue, currentValue)
+                currentValue.concat(prevValue)
               )
               .filter((menuItem) =>
                 menuItem.Name.toLowerCase().includes(
@@ -65,11 +65,11 @@ export const getFitleredRestaurants = (searchKeyword, restaurants) => {
   };
 };
 
-const getRelevanceNumber = (restaurant) => {
+export const getRelevanceNumber = (restaurant) => {
   const menuItemsLength = restaurant.MenuItems.length;
   const menuItemsFromCategoryLength = restaurant.Categories.map(
     ({ MenuItems }) => MenuItems
-  ).reduce((prevValue, currentValue) => union(prevValue, currentValue), [])
+  ).reduce((prevValue, currentValue) => currentValue.concat(prevValue), [])
     .length;
 
   return menuItemsLength + menuItemsFromCategoryLength;
