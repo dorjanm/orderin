@@ -64,3 +64,20 @@ export const getFitleredRestaurants = (searchKeyword, restaurants) => {
     filteredRestaurants,
   };
 };
+
+const getRelevanceNumber = (restaurant) => {
+  const menuItemsLength = restaurant.MenuItems.length;
+  const menuItemsFromCategoryLength = restaurant.Categories.map(
+    ({ MenuItems }) => MenuItems
+  ).reduce((prevValue, currentValue) => union(prevValue, currentValue), [])
+    .length;
+
+  return menuItemsLength + menuItemsFromCategoryLength;
+};
+
+export const getSortedRestaurants = (sortMethod, restaurants) =>
+  sortMethod === "rank"
+    ? restaurants.sort((a, b) => (b.Rank < a.Rank ? 1 : -1))
+    : restaurants.sort((a, b) =>
+        getRelevanceNumber(a) < getRelevanceNumber(b) ? 1 : -1
+      );
