@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Input, Typography, Modal } from "antd";
+import { Input, Typography, Modal, Radio } from "antd";
 import "antd/dist/antd.css";
 
 import "./App.css";
 import SampleData from "./SampleData.json";
 import Restaurant from "./components/Restaurant/Restaurant";
-import { getFitleredRestaurants } from "./common/utils";
+import { getFitleredRestaurants, getSortedRestaurants } from "./common/utils";
 import OrderList from "./components/OrderList/OrderList";
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
   const [product, setProduct] = useState("");
   const [location, setLocation] = useState("");
   const [selectedMenuItems, setSelectedMenuItems] = useState([]);
+  const [sortMethod, setSortMethod] = useState("rank");
 
   const { Search } = Input;
   const { Title } = Typography;
@@ -33,7 +34,15 @@ function App() {
     ? productSubTitle + citySubTitle
     : "No result.";
 
-  const onSearch = (value) => {
+  const resetState = () => {
+    setRestaurants([]);
+    setProduct("");
+    setLocation("");
+    setSelectedMenuItems([]);
+  };
+
+  // handlers
+  const handleSearch = (value) => {
     if (value) {
       const {
         productSearched,
@@ -41,11 +50,9 @@ function App() {
         filteredRestaurants,
       } = getFitleredRestaurants(value, jsonData);
 
-      const sortedRestaurants = filteredRestaurants.sort((a, b) =>
-        b.Rank < a.Rank ? 1 : -1
-      );
+      getSortedRestaurants(sortMethod, filteredRestaurants);
 
-      setRestaurants(sortedRestaurants);
+      setRestaurants(filteredRestaurants);
       setProduct(productSearched);
       setLocation(locationSearched);
     } else {
@@ -66,6 +73,49 @@ function App() {
     renderModal();
   };
 
+  const handleSortChange = (e) => {
+    const sort = e.target.value;
+
+    setSortMethod(sort);
+    getSortedRestaurants(sort, restaurants);
+  };
+
+  // renders
+  const renderSearchBar = () => (
+    <Search
+      placeholder="Search product or restaurant"
+      onSearch={handleSearch}
+      enterButton
+      style={{ width: "300px" }}
+      size="medium"
+      allowClear
+    />
+  );
+
+  const renderSortMenu = () => {
+    return restaurants.length ? (
+      <>
+        <b style={{ marginLeft: 20 }}> Sort by: </b>
+        <Radio.Group
+          onChange={handleSortChange}
+          value={sortMethod}
+          style={{ marginBottom: 8 }}
+        >
+          <Radio.Button value="rank">Rank</Radio.Button>
+          <Radio.Button value="relevance">Relevance</Radio.Button>
+        </Radio.Group>
+      </>
+    ) : null;
+  };
+
+  const renderOrderList = () => (
+    <OrderList
+      items={selectedMenuItems}
+      total={total}
+      onOrder={handleNewOrder}
+    />
+  );
+
   const renderModal = () =>
     Modal.success({
       title: "Success",
@@ -80,24 +130,11 @@ function App() {
       },
     });
 
-  const resetState = () => {
-    setRestaurants([]);
-    setProduct("");
-    setLocation("");
-    setSelectedMenuItems([]);
-  };
-
   return (
     <div className="App">
       <div style={{ flex: "auto" }}>
-        <Search
-          placeholder="Search product or restaurant"
-          onSearch={onSearch}
-          enterButton
-          style={{ width: "300px" }}
-          size="medium"
-          allowClear
-        />
+        {renderSearchBar()}
+        {renderSortMenu()}
       </div>
 
       <div style={{ margin: "40px" }}>
@@ -112,11 +149,7 @@ function App() {
           />
         ))}
       </div>
-      <OrderList
-        items={selectedMenuItems}
-        total={total}
-        onOrder={handleNewOrder}
-      />
+      {renderOrderList()}
     </div>
   );
 }
